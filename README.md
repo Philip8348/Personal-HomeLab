@@ -7,6 +7,7 @@ Personal Proxmox-based homelab running self-hosted services with reverse proxy, 
 
 ## Virtual Machine's and Linux Containers
 | Service | Type | Purpose |
+|---------|------|---------|
 | Vaultwarden | VM | Self-Hosted password manager |
 | Game-server | VM | RL Craft |
 | Dashboard | VM | Service dashboard |
