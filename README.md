@@ -3,6 +3,8 @@ Personal Proxmox-based homelab running self-hosted services with reverse proxy, 
 Todo-
 read me van nginxy aanpassen welke ips allemaal veranderd zijn
 Homarr screenshot toevoegen + services melden
+ai-agents alle webpaginas toevoegen/maken
+
 
 
 ## Infrastructure Overview
