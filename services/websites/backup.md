@@ -1,4 +1,4 @@
-# Vaultwarden Backup & Restore
+# Vaultwarden Backup
 
 ## Backup Strategie
 
