@@ -1,8 +1,8 @@
 # VM100 - Vaultwarden
 
-## Overzicht
-| Resource | Waarde |
-|----------|--------|
+## Overview
+| Resource | Value |
+|----------|-------|
 | VM ID | 100 |
 | Hostname | vaultwarden |
 | IP | vaultwarden.example.home |
@@ -10,19 +10,19 @@
 | CPU/RAM | 1 core / 1GB |
 | Disk | 40 GB |
 
-## Wat draait er
-| Container | Image | Poort |
-|-----------|-------|-------|
+## Running Containers
+| Container | Image | Port |
+|-----------|-------|------|
 | vaultwarden | `vaultwarden/server:latest` | 8080→80 |
 | portainer_agent | `portainer/agent:latest` | 9001→9001 |
 
-## Config Locatie
+## Config Location
 - Docker Compose: `/opt/vaultwarden/docker-compose.yml`
 - Data: `/opt/vaultwarden/`
 
-## Afwijkingen van Default
-- Signups uitgeschakeld (veiligheid)
-- Reverse proxy op LXC106 voor HTTPS
+## Changes from Default
+- Signups disabled (security)
+- Reverse proxy on LXC106 for HTTPS
 
-## Toegang
+## Access
 - **Web UI:** Via LXC106 reverse proxy (Nginx)
