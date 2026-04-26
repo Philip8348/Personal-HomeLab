@@ -12,15 +12,21 @@
 | Auto-boot | Yes (onboot: 1) |
 
 ## Running Services
-- **Homarr** - Homelab dashboard (service status, links, system info)
+- **Homarr** - Homelab dashboard
 
 ## Config Location
-- Docker Compose: [path to docker-compose.yml]
-- Data: [path to homarr data]
-- Config: [path to homarr configs]
+- Docker Compose: `/home/<user>/homarr/docker-compose.yml`
+- Data/Config: `/home/<user>/homarr/homarr/appdata/`
 
-## Changes from Default
-- Disk 86% full
+## Dashboard Content
+Coming 
 
-## Notes
-- Central overview for all homelab services
+## Access
+- **Dashboard UI:** `http://homarr.example.home`
+
+## Quick Commands
+```bash
+docker ps
+docker logs homarr -f
+docker restart homarr
+```
