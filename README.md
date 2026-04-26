@@ -1,5 +1,7 @@
 Personal Proxmox-based homelab running self-hosted services with reverse proxy, DNS filtering, and more.
 
+read me van nginxy aanpassen welke ips allemaal veranderd zijn
+
 ## Infrastructure Overview
 **Hypervisor:** Proxmox VE 9.1.7 
 **Hardware:** AMD Ryzen 5 2600X, 32GB DDR4, 500GB SSD + 1TB HDD + 4TB HDD, RTX 3060 12VRAM
