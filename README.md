@@ -1,6 +1,9 @@
 Personal Proxmox-based homelab running self-hosted services with reverse proxy, DNS filtering, and more.
 
+Todo-
 read me van nginxy aanpassen welke ips allemaal veranderd zijn
+Homarr screenshot toevoegen + services melden
+
 
 ## Infrastructure Overview
 **Hypervisor:** Proxmox VE 9.1.7 
