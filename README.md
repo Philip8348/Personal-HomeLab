@@ -25,7 +25,7 @@ Self-hosted infrastructure running on Proxmox VE with a mix of VMs, LXC containe
 | 106 | reverse-proxy | Nginx reverse proxy (LXC) | 1 CPU / 512 MB RAM |
 | 107 | media | Torrent stack (qBittorrent, Prowlarr, Radarr, Jellyfin, Bazarr) | 2 CPU / 6 GB RAM |
 | 108 | vogelmonitoring | Bird sex classification project | Low usage |
-| 109 | ai-agents | Hermes Agent + ComfyUI + Ollama + n8n | 12 CPU / 16 GB RAM + RTX 3060 |
+| 109 | ai-agents | Hermes Agent + ComfyUI + Ollama + n8n | 8 CPU / 16 GB RAM + RTX 3060 |
 | — | Raspberry Pi 5 | Pi-hole + InfluxDB + Grafana + Home Assistant (Docker) + WireGuard (bare metal) | 4 GB RAM |
 
 ## Services by Category
