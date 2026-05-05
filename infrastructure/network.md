@@ -4,7 +4,7 @@
 
 All services use `.home` domains resolved by Pi-hole (Raspberry Pi 5).
 
-Internal addresses use 192.168.x.x/24 subnet.
+Internal addresses use 192.168.x.x subnet.
 
 ## Domain Map
 
@@ -15,6 +15,4 @@ Internal addresses use 192.168.x.x/24 subnet.
 | portainer.example.home | Portainer (VM103) |
 | openwebui.example.home | Open WebUI (VM109) |
 | n8n.example.home | n8n (VM109) |
-| openclaw.example.home | Hermes Agent (VM109) |
-| reverse-proxy.example.home | Nginx (LXC106) |
 | pihole.example.home | Pi-hole (Pi5) |
