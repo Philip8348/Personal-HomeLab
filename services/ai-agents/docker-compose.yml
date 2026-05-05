@@ -40,7 +40,7 @@ services:
     ports:
       - "5678:5678"
     environment:
-      - N8N_BASIC_AUTH_ACTIVE=${N8N_BASIC_AUTH_ACTIVE}
+      - N8N_BASIC_AUTH_ACTIVE=false
       - N8N_SECURE_COOKIE=false
       - WEBHOOK_URL=https://n8n.example.home
       - N8N_HOST=n8n.example.home
@@ -60,6 +60,7 @@ services:
     command: gateway run
     network_mode: host
     shm_size: 1g
+    user: "1000:1000"
     volumes:
       - /mnt/4tb/hermes:/opt/data
       - /mnt/4tb/obsidian-vault:/obsidian-vault
@@ -68,6 +69,9 @@ services:
       - /mnt/4tb/comfyui/scripts:/comfyui-scripts
     environment:
       - TZ=Europe/Amsterdam
+      - API_SERVER_KEY=ya9Hhy09iuuCwp
+      - API_SERVER_HOST=0.0.0.0
+      - HOME=/opt/data
     deploy:
       resources:
         limits:
@@ -75,15 +79,22 @@ services:
           cpus: "2.0"
 
   hermes-dashboard:
-    image: nousresearch/hermes-dashboard:latest
+    image: nousresearch/hermes-agent:latest
     container_name: hermes-dashboard
     restart: unless-stopped
-    ports:
-      - "9119:9119"
+    network_mode: host
+    user: "1000:1000"
+    command: dashboard --host 0.0.0.0 --insecure --no-open --port 9119
     volumes:
       - /mnt/4tb/hermes:/opt/data
     environment:
       - TZ=Europe/Amsterdam
+      - GATEWAY_HEALTH_URL=http://127.0.0.1:8642
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
 
   syncthing:
     image: syncthing/syncthing:latest
