@@ -1,82 +1,81 @@
 # VM109 - AI Agents
 
+Central hub for AI workloads, agent management, and workflow automation. The heaviest VM in the homelab with GPU passthrough.
+
 ## Overview
+
 | Resource | Value |
 |----------|-------|
 | VM ID | 109 |
 | Hostname | ai-agents |
 | IP | ai-agents.example.home |
 | OS | Ubuntu 24.04.4 LTS |
-| CPU/RAM | 12 cores / 16GB |
-| GPU | NVIDIA RTX 3060 (12GB VRAM) |
-| Auto-boot | Yes (onboot: 1) |
+| CPU/RAM | 8 cores / 16 GB |
+| GPU | NVIDIA RTX 3060 (12 GB VRAM, passthrough) |
+| Auto-boot | Yes |
 
-## What's Running
+## Docker Containers
 
-### Docker Containers
-| Container | Purpose |
-|-----------|---------|
-| ollama | Local LLM inference (GPU) |
-| open-webui | Web UI for Ollama |
-| n8n | Workflow automation |
-| openclaw-dashboard | OpenClaw management |
-| syncthing | Obsidian vault sync |
+| Container | Purpose | Port |
+|-----------|---------|------|
+| ollama | Local LLM inference (GPU) | 11434 |
+| open-webui | Web UI for Ollama | 3000 |
+| n8n | Workflow automation | 5678 |
+| hermes-agent | AI agent gateway | 8642 |
+| hermes-dashboard | Agent dashboard & session viewer | 9119 |
+| syncthing | Obsidian vault sync | 8384 |
 
-### Systemd Services
-| Service | Purpose |
-|---------|---------|
-| comfyui | AI image generation |
+## Systemd Services
 
-## Config Location
-- Docker Compose: `/home/<user>/docker/docker-compose.yml`
-- OpenClaw data: `/mnt/4tb/ai-agents/openclaw/`
-- ComfyUI: `/home/<user>/ComfyUI/`
-- Main storage: `/mnt/4tb/ai-agents/`
-
-## Storage Breakdown
-| Path | Size | Content |
-|------|------|---------|
-| `/mnt/4tb/ai-agents/ollama` | 35GB | LLM models |
-| `/mnt/4tb/ai-agents/open-webui` | 891MB | WebUI data |
-| `/mnt/4tb/ai-agents/openclaw` | 97MB | OpenClaw config |
-| `/mnt/4tb/comfyui` | 8.4MB | Generated images |
+| Service | Purpose | Port |
+|---------|---------|------|
+| comfyui | AI image generation (Stable Diffusion) | 8188 |
+| hermes-workspace | SvelteKit UI, chat & operations | 3001 |
 
 ## GPU Usage
-**NVIDIA RTX 3060 (12GB VRAM)**
-- ComfyUI: (Stable Diffusion)
-- Ollama: Available for LLM inference
 
-## Changes from Default
-- GPU passthrough enabled
-- Multi-tier AI model fallback (free → paid)
-- ComfyUI runs as systemd service (not Docker)
+NVIDIA RTX 3060 (12 GB VRAM) shared between:
+- **ComfyUI** — Stable Diffusion image generation
+- **Ollama** — LLM inference when needed
+
+## Storage
+
+| Path | Content |
+|------|---------|
+| `/mnt/4tb/ai-agents/ollama` | LLM models |
+| `/mnt/4tb/ai-agents/open-webui` | Open WebUI data |
+| `/mnt/4tb/hermes` | Hermes Agent configuration & profiles |
+| `/mnt/4tb/obsidian-vault` | Obsidian vault (Syncthing source) |
+| `/mnt/4tb/comfyui/output` | ComfyUI generated images |
+| `/mnt/4tb/comfyui/scripts` | ComfyUI automation scripts |
+| `/mnt/4tb/n8n` | n8n workflow data |
 
 ## Access
-- **Open WebUI:** `openwebui.example.home`
-- **n8n:** `n8n.example.home`
-- **ComfyUI:** `comfyui.example.home:8188`
-- **OpenClaw Dashboard:** `openclaw.example.home`
+
+| Service | URL |
+|---------|-----|
+| Open WebUI | openwebui.example.home |
+| n8n | n8n.example.home |
+| ComfyUI | ai-agents.example.home:8188 |
+| Hermes Workspace | ai-agents.example.home:3001 |
 
 ## Quick Commands
+
 ```bash
 # Docker services
-cd /home/<user>/docker && docker-compose logs -f
+cd /home/<user>/docker && docker compose logs -f
 
 # ComfyUI
 systemctl status comfyui
 systemctl restart comfyui
 
+# Hermes Workspace
+systemctl status hermes-workspace
+
 # GPU monitoring
 nvidia-smi
 ```
 
-## Related Documentation
-- [Docker Compose](docker-compose.md)
-- [n8n Workflows](n8n-workflows.md)
-- [ComfyUI Workflows](comfyui-workflows.md)
+## Related
 
-## Notes
-- Central AI automation hub
-- Atlas (OpenClaw) manages infrastructure
-- Free AI models minimize costs
-- Critical disk usage - cleanup recommended
+- [Docker Compose](docker-compose.yml)
