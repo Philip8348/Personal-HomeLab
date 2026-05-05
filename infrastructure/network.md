@@ -4,7 +4,7 @@
 
 All services use `.home` domains resolved by Pi-hole (Raspberry Pi 5).
 
-Internal addresses use <lan-subnet>/24 subnet.
+Internal addresses use 192.168.x.x/24 subnet.
 
 ## Domain Map
 
