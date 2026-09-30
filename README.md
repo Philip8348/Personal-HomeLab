@@ -48,16 +48,16 @@ Every service gets its own `.home` domain. Pi-hole resolves it to the reverse pr
 
 | ID | Name | Role | Status |
 |----|------|------|--------|
-| VM100 | Digital Vault | Vaultwarden, Paperless-ngx, Immich, Gramps Web | 🟢 Running |
-| VM101 | AI-Agents | Hermes agent, Ollama (RTX 3060), SearXNG, Crawl4AI, n8n, Syncthing | 🟢 Running |
-| VM102 | Media | Gluetun (VPN), qBittorrent, Prowlarr, Radarr, Sonarr, Bazarr, Jellyfin, Seerr | 🟢 Running |
-| VM103 | Game server | Minecraft (All the Mods 10) | ⚪ Stopped |
-| LXC104 | Reverse proxy | Nginx, HTTPS for all `.home` domains | 🟢 Running |
-| LXC105 | Certificate authority | step-ca (ECC P-256 root + intermediate) | 🟢 Running |
-| LXC106 | Monitoring | Prometheus, Grafana, Alertmanager, Uptime Kuma, Homarr | 🟢 Running |
-| VM107 | Nextcloud | Mail, calendar and tasks in one web app | 🟢 Running |
-| VM108 | Game server | 7 Days to Die | ⚪ Stopped |
-| — | Raspberry Pi 5 | Pi-hole, WireGuard (wg-easy), Home Assistant (incl. energy monitoring) | 🟢 Running |
+| [VM100](services/vm100-digital-vault/) | Digital Vault | Vaultwarden, Paperless-ngx, Immich, Gramps Web | 🟢 Running |
+| [VM101](services/vm101-ai-agents/) | AI-Agents | Hermes agent, Ollama (RTX 3060), SearXNG, Crawl4AI, n8n, Syncthing | 🟢 Running |
+| [VM102](services/vm102-media/) | Media | Gluetun (VPN), qBittorrent, Prowlarr, Radarr, Sonarr, Bazarr, Jellyfin, Seerr | 🟢 Running |
+| [VM103](services/vm103-game-servers/) | Game server | Minecraft (All the Mods 10) | ⚪ Stopped |
+| [LXC104](services/lxc104-reverse-proxy/) | Reverse proxy | Nginx, HTTPS for all `.home` domains | 🟢 Running |
+| [LXC105](services/lxc105-certificate-authority/) | Certificate authority | step-ca (ECC P-256 root + intermediate) | 🟢 Running |
+| [LXC106](services/lxc106-monitoring/) | Monitoring | Prometheus, Grafana, Alertmanager, Uptime Kuma, Homarr | 🟢 Running |
+| [VM107](services/vm107-nextcloud/) | Nextcloud | Mail, calendar and tasks in one web app | 🟢 Running |
+| [VM108](services/vm103-game-servers/) | Game server | 7 Days to Die | ⚪ Stopped |
+| — | [Raspberry Pi 5](services/raspberry-pi-5/) | Pi-hole, WireGuard (wg-easy), Home Assistant (incl. energy monitoring) | 🟢 Running |
 
 ## Highlights
 
@@ -74,7 +74,7 @@ Every service gets its own `.home` domain. Pi-hole resolves it to the reverse pr
 | Folder | Contents |
 |--------|----------|
 | [`infrastructure/`](infrastructure/) | [Proxmox host](infrastructure/proxmox-host.md), [network](infrastructure/network.md) and [security](infrastructure/security.md) |
-| `services/` | One page per VM or service: what it does, why, and how it's set up |
+| [`services/`](services/) | One page per VM or container: what runs there, how it's set up, and what I learned |
 
 ## Roadmap
 
