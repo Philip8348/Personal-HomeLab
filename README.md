@@ -73,7 +73,7 @@ Every service gets its own `.home` domain. Pi-hole resolves it to the reverse pr
 
 | Folder | Contents |
 |--------|----------|
-| `infrastructure/` | Proxmox host, storage and network |
+| [`infrastructure/`](infrastructure/) | [Proxmox host](infrastructure/proxmox-host.md), [network](infrastructure/network.md) and [security](infrastructure/security.md) |
 | `services/` | One page per VM or service: what it does, why, and how it's set up |
 
 ## Roadmap
