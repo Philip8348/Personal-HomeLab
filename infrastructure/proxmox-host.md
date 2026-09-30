@@ -16,7 +16,11 @@ The single hypervisor in the homelab. Every VM and LXC container runs here.
 
 ### Why EPYC?
 
-I rebuilt the server on a single-socket SP3 platform in mid-2026, replacing a Ryzen 5 2600X desktop build. A refurbished EPYC 7402P was cheap (under €200) and gives far more cores, PCIe lanes, memory channels and ECC support than any desktop platform at that price. The board's IPMI means I can manage the server remotely, including power and console. I considered SP5 (much more expensive, DDR5) and dual-socket boards (NUMA overhead, E-ATX), but neither was worth it for a homelab.
+The homelab started on a repurposed Ryzen 5 2600X desktop. It worked, but I kept running into its limits: I regularly had to shut down one VM to free up CPU and RAM for another. I also wanted a lot more storage, and rather than buying a separate NAS, I wanted it in the same machine.
+
+In mid-2026 I moved to a single-socket AMD EPYC platform. The refurbished EPYC 7402P itself was surprisingly cheap (under €200). The Supermicro H12SSL-i board was the real investment, at around €900. In return I got 24 cores, 8 memory channels with ECC, plenty of PCIe lanes and SATA ports for data drives, and IPMI to manage the server remotely, including power and console.
+
+I also looked at the newer SP5 platform (far more expensive, DDR5 only) and dual-socket boards (NUMA overhead, large E-ATX boards). For a homelab, neither was worth it.
 
 ## Software
 
