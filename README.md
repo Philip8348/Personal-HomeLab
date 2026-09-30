@@ -38,7 +38,6 @@ flowchart TB
     end
 
     RP --> HA[Home Assistant<br/>Raspberry Pi 5]
-    L106 -. metrics & alerts .-> PVE
     L106 -- alerts --> DC([Discord])
     WG[WireGuard VPN<br/>Raspberry Pi 5] --> LAN
 ```
