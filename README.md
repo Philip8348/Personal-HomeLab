@@ -1,62 +1,83 @@
 # Personal HomeLab
 
-Self-hosted infrastructure running on Proxmox VE with a mix of VMs, LXC containers, and a Raspberry Pi 5. Built for learning, automation, and running useful services at home.
+A self-hosted homelab built around a single AMD EPYC server running Proxmox VE, plus a Raspberry Pi 5 for network services and home automation. I use it to learn Linux, networking, virtualization and security hands-on, and to run services my family actually uses every day.
+
+> Internal IP addresses, domains and secrets are intentionally left out of this repo.
 
 ## Hardware
 
 | Component | Details |
 |-----------|---------|
-| CPU | AMD Ryzen 5 2600X |
-| RAM | 32 GB DDR4 |
-| GPU | NVIDIA RTX 3060 12 GB (passthrough to AI VM) |
-| Storage | 500 GB SSD + 1 TB HDD + 4 TB HDD |
-| Hypervisor | Proxmox VE 9.1.7 |
-| Extra | Raspberry Pi 5 (4 GB) |
+| CPU | AMD EPYC 7402P (24 cores / 48 threads) |
+| Motherboard | Supermicro H12SSL-i (with IPMI) |
+| RAM | 64 GB DDR4-2666 ECC RDIMM (4 × 16 GB, quad-channel) |
+| GPU | NVIDIA RTX 3060 12 GB (passed through to the AI VM) |
+| Boot / VM storage | Samsung 990 PRO 1 TB NVMe |
+| Data storage | 2 × 8 TB HDD (ZFS mirror) · 4 TB IronWolf · 1 TB HDD (backups) |
+| Cooling | Noctua NH-U9 TR4-SP3 |
+| PSU | Seasonic Focus GX-850 |
+| Case & rack | Lanberg 4U chassis in a Lanberg 12U closed rack, 1U PDU |
+| Network | Zyxel GS1900-8 managed switch |
+| Hypervisor | Proxmox VE 9 (Debian 13) |
+| Extra node | Raspberry Pi 5 (4 GB) with 500 GB SSD |
 
-## Virtual Machines & Containers
+## Architecture
 
-| VM/LXC | Hostname | Role | Resources |
-|--------|----------|------|-----------|
-| 100 | vaultwarden | Password manager | 1 CPU / 1 GB RAM |
-| 101 | game-server | Game server (on-demand) | 4 CPU / 5 GB RAM |
-| 102 | dashboard | Homarr dashboard | 2 CPU / 2 GB RAM |
-| 103 | portainer | Docker management | 2 CPU / 1 GB RAM |
-| 104 | websites | Vogelsite | 2 CPU / 2 GB RAM |
-| 106 | reverse-proxy | Nginx reverse proxy (LXC) | 1 CPU / 512 MB RAM |
-| 107 | media | Torrent stack (qBittorrent, Prowlarr, Radarr, Jellyfin, Bazarr) | 2 CPU / 6 GB RAM |
-| 108 | vogelmonitoring | Bird sex classification project | Low usage |
-| 109 | ai-agents | Hermes Agent + ComfyUI + Ollama + n8n | 8 CPU / 16 GB RAM + RTX 3060 |
-| — | Raspberry Pi 5 | Pi-hole + InfluxDB + Grafana + Home Assistant (Docker) + WireGuard (bare metal) | 4 GB RAM |
+```mermaid
+flowchart TB
+    LAN([Home network]) --> DNS[Pi-hole DNS<br/>Raspberry Pi 5]
 
-## Services by Category
+    subgraph PVE[Proxmox VE — EPYC server]
+        CA[LXC105 · step-ca private PKI] -. TLS certificates .-> RP[LXC104 · Nginx reverse proxy]
+        RP --> V100[VM100 · Digital Vault]
+        RP --> V101[VM101 · AI & Automation]
+        RP --> V102[VM102 · Media]
+        RP --> V107[VM107 · Nextcloud]
+        RP --> L106[LXC106 · Monitoring]
+    end
 
-### Infrastructure
-- **Nginx Reverse Proxy** (LXC106) — HTTPS termination for all `.home` domains
-- **Pi-hole** (Pi5) — DNS filtering & ad blocking, bare metal
-- **WireGuard** (Pi5) — VPN access to home network, bare metal
+    DNS --> RP
+    RP --> HA[Home Assistant<br/>Raspberry Pi 5]
+    L106 -- alerts --> DC([Discord])
+    WG[WireGuard VPN<br/>Raspberry Pi 5] --> LAN
+```
 
-### Web Services
-- **Vaultwarden** (VM100) — Self-hosted Bitwarden password manager
-- **Homarr** (VM102) — Dashboard for all homelab services
+Every service gets its own `.home` domain. Pi-hole resolves it to the reverse proxy, which terminates HTTPS with certificates from my own certificate authority.
 
-### Media
-- **Jellyfin** (VM107) — Media streaming
-- **qBittorrent + Prowlarr + Radarr + Bazarr** (VM107) — Media management stack
+## Virtual machines & containers
 
-### AI & Automation
-- **Hermes Agent** (VM109) — AI agent gateway
-- **Ollama** (VM109) — Local LLM inference with GPU
-- **Open WebUI** (VM109) — Web interface for Ollama
-- **ComfyUI** (VM109) — AI image generation
-- **n8n** (VM109) — Workflow automation
+| ID | Name | Role | Status |
+|----|------|------|--------|
+| VM100 | Digital Vault | Vaultwarden, Paperless-ngx, Immich, Gramps Web | 🟢 Running |
+| VM101 | AI-Agents | Hermes agent, Ollama (RTX 3060), SearXNG, Crawl4AI, n8n, Syncthing | 🟢 Running |
+| VM102 | Media | Gluetun (VPN), qBittorrent, Prowlarr, Radarr, Sonarr, Bazarr, Jellyfin, Seerr | 🟢 Running |
+| VM103 | Game server | Minecraft (All the Mods 10) | ⚪ Stopped |
+| LXC104 | Reverse proxy | Nginx, HTTPS for all `.home` domains | 🟢 Running |
+| LXC105 | Certificate authority | step-ca (ECC P-256 root + intermediate) | 🟢 Running |
+| LXC106 | Monitoring | Prometheus, Grafana, Alertmanager, Uptime Kuma, Homarr | 🟢 Running |
+| VM107 | Nextcloud | Mail, calendar and tasks in one web app | 🟢 Running |
+| VM108 | Game server | 7 Days to Die | ⚪ Stopped |
+| — | Raspberry Pi 5 | Pi-hole, WireGuard (wg-easy), Home Assistant (incl. energy monitoring) | 🟢 Running |
 
-### Monitoring & Data
-- **InfluxDB** (Pi5) — Time-series data collection (energy monitoring)
-- **Grafana** (Pi5) — Data visualization dashboards
-- **Portainer** (VM103) — Docker management UI
+## Highlights
 
-### Other
-- **Home Assistant** (Pi5) — Home automation
-- **Game Server** (VM101) — On-demand game server
-- **Vogelmonitoring** (VM108) — Bird classification project
-- **Vogelsite** (VM104) — Bird website
+- **Private PKI.** My own step-ca certificate authority issues the TLS certificates, so every internal service runs on HTTPS without browser warnings.
+- **Monitoring and alerting.** Prometheus scrapes node, SMART and IPMI exporters. Grafana shows disk temperatures, fans and ZFS health, and Alertmanager sends alerts (for example a degraded ZFS pool) to Discord.
+- **Storage.** Important data (documents, photos, passwords) lives on a ZFS mirror of two 8 TB drives, passed through to the Digital Vault VM. Proxmox backs up every VM and container twice a week to a separate 1 TB backup drive.
+- **Firewalling.** All running hosts use a default-deny firewall. Docker ports are only reachable through the reverse proxy.
+- **AI agent.** A self-hosted Hermes agent ("Atlas") helps me manage the servers over SSH and keeps the documentation up to date.
+- **Energy monitoring.** Home Assistant reads the P1 smart meter, smart plugs and a home battery through native integrations.
+- **VPN.** WireGuard gives remote access to the home network without exposing services to the internet.
+
+## Repository structure
+
+| Folder | Contents |
+|--------|----------|
+| `infrastructure/` | Proxmox host, storage and network |
+| `services/` | One page per VM or service: what it does, why, and how it's set up |
+
+## Roadmap
+
+- Offsite backups for the Digital Vault data
+- Network segmentation with VLANs (MikroTik router + managed switch)
+- Faster networking (2.5 or 10 GbE)
