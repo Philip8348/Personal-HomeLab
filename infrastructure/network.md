@@ -2,7 +2,19 @@
 
 ## Current layout
 
-Everything currently sits on one flat home subnet with static addresses for the servers. The EPYC host connects to a Zyxel GS1900-8 managed switch in the rack.
+```mermaid
+flowchart LR
+    ISP([Internet]) --> MODEM[ISP modem]
+    MODEM -- LAN --> DECO1[Deco main node]
+    DECO1 -. Wi-Fi backhaul .-> DECO2[Deco node<br/>near the rack]
+    DECO2 --> SW[Zyxel GS1900-8<br/>managed switch]
+    SW --> EPYC[EPYC Proxmox host]
+    SW --> IPMI[IPMI / BMC]
+    SW --> PI[Raspberry Pi 5]
+    DECO1 -.-> CLIENTS[Phones, laptops, TV, IoT]
+```
+
+Everything currently sits on one flat home subnet with static addresses for the servers. The rack (EPYC host, its IPMI port and the Raspberry Pi 5) is wired to a Zyxel GS1900-8 managed switch. The switch reaches the rest of the house through a TP-Link Deco mesh node with a wireless backhaul. That wireless link is the weakest point of the network, and a wired uplink is on the roadmap.
 
 ## DNS
 
@@ -35,6 +47,7 @@ WireGuard (wg-easy) on the Raspberry Pi 5 is the only way in from outside. Nothi
 
 ## Roadmap
 
+- A wired uplink from the rack to the modem (replacing the Wi-Fi backhaul)
 - VLAN segmentation (servers, home devices, Wi-Fi) with a MikroTik router and the managed switch
 - A second internal DNS server, because `.home` names stop resolving when Pi-hole is down
 - Faster networking (2.5 or 10 GbE)
