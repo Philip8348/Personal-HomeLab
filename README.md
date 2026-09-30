@@ -25,21 +25,34 @@ A self-hosted homelab built around a single AMD EPYC server running Proxmox VE, 
 
 ```mermaid
 flowchart TB
-    LAN([Home network]) --> DNS[Pi-hole DNS<br/>Raspberry Pi 5]
-    DNS --> RP[Nginx reverse proxy<br/>LXC104]
-    CA[step-ca private PKI<br/>LXC105] -. TLS certificates .-> RP
+    LAN([Home network]) --> DNS
 
-    subgraph PVE[Proxmox VE — EPYC server]
-        RP --> V100[VM100 · Digital Vault]
-        RP --> V101[VM101 · AI & Automation]
-        RP --> V102[VM102 · Media]
-        RP --> V107[VM107 · Nextcloud]
-        RP --> L106[LXC106 · Monitoring]
+    subgraph PI[Raspberry Pi 5]
+        DNS[Pi-hole DNS]
+        WG[WireGuard VPN]
+        HA[Home Assistant]
     end
 
-    RP --> HA[Home Assistant<br/>Raspberry Pi 5]
+    subgraph PVE[Proxmox VE — EPYC server]
+        RP[LXC104 · Nginx reverse proxy]
+        CA[LXC105 · step-ca private PKI]
+        V100[VM100 · Digital Vault]
+        V101[VM101 · AI & Automation]
+        V102[VM102 · Media]
+        V107[VM107 · Nextcloud]
+        L106[LXC106 · Monitoring]
+        CA -. TLS certificates .-> RP
+        RP --> V100
+        RP --> V101
+        RP --> V102
+        RP --> V107
+        RP --> L106
+    end
+
+    DNS --> RP
+    RP --> HA
+    WG --> LAN
     L106 -- alerts --> DC([Discord])
-    WG[WireGuard VPN<br/>Raspberry Pi 5] --> LAN
 ```
 
 Every service gets its own `.home` domain. Pi-hole resolves it to the reverse proxy, which terminates HTTPS with certificates from my own certificate authority.
