@@ -1,0 +1,99 @@
+groups:
+  - name: hardware
+    rules:
+      # ── HDD / SSD temps (per-device, via smartctl) ──────────────────────────
+      - alert: HDDTempHigh
+        expr: smartctl_device_temperature{device=~"sd.*"} > 50
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "HDD temp hoog: {{ $labels.device }} op {{ $labels.instance }}"
+          description: "Schijf {{ $labels.device }} ({{ $labels.instance }}) is {{ $value }}°C (drempel 50°C)"
+
+      - alert: HDDTempCritical
+        expr: smartctl_device_temperature{device=~"sd.*"} > 55
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: "HDD temp CRITICAL: {{ $labels.device }} op {{ $labels.instance }}"
+          description: "Schijf {{ $labels.device }} ({{ $labels.instance }}) is {{ $value }}°C (kritiek, drempel 55°C)"
+
+      # ── CPU temp (via IPMI/BMC) ─────────────────────────────────────────────
+      - alert: CPUTempHigh
+        expr: ipmi_temperature_celsius{name="CPU Temp"} > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU temp hoog: {{ $value }}°C op {{ $labels.instance }}"
+          description: "CPU temp is {{ $value }}°C (drempel 80°C) op {{ $labels.instance }}"
+
+      - alert: CPUTempCritical
+        expr: ipmi_temperature_celsius{name="CPU Temp"} > 90
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "CPU temp CRITICAL: {{ $value }}°C op {{ $labels.instance }}"
+          description: "CPU temp is {{ $value }}°C (kritiek, drempel 90°C) op {{ $labels.instance }}"
+
+      # ── NVMe temp (alleen NVMe-sensors, gefilterd op chip) ─────────────────
+      - alert: NVMeTempHigh
+        expr: node_hwmon_temp_celsius{chip=~"nvme.*"} > 70
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "NVMe temp hoog: {{ $value }}°C op {{ $labels.instance }}"
+          description: "NVMe ({{ $labels.chip }}) is {{ $value }}°C (drempel 70°C) op {{ $labels.instance }}"
+
+      - alert: NVMeTempCritical
+        expr: node_hwmon_temp_celsius{chip=~"nvme.*"} > 80
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "NVMe temp CRITICAL: {{ $value }}°C op {{ $labels.instance }}"
+          description: "NVMe ({{ $labels.chip }}) is {{ $value }}°C (kritiek, drempel 80°C) op {{ $labels.instance }}"
+
+      # ── ZFS pool status (Digital Vault) ──────────────────────────────
+      - alert: ZFSPoolDegraded
+        expr: node_zfs_zpool_state{state!="online"} == 1
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "ZFS pool {{ $labels.zpool }} is {{ $labels.state }} op {{ $labels.instance }}"
+          description: "Pool {{ $labels.zpool }} ({{ $labels.instance }}) is in staat '{{ $labels.state }}'. Schijfprobleem — controleer zpool status."
+
+
+      # ── Disk ruimte laag (all scraped hosts) ────────────────────────────
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) < 0.10
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Disk-ruimte laag op {{ $labels.instance }}: {{ $value }} ratio vrij"
+          description: "Bestandssysteem {{ $labels.mountpoint }} op {{ $labels.instance }} heeft nog maar {{ $value }} vrije ruimte-ratio over (drempel 10%)."
+
+      # ── SMART disk gezondheid (FAILED) ───────────────────────────────────────
+      - alert: DiskSMARTFailure
+        expr: smartctl_device_smart_status == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "SMART-fout op schijf {{ $labels.device }} ({{ $labels.instance }})"
+          description: "Schijf {{ $labels.device }} meldt een SMART-gezondheidsfout op {{ $labels.instance }}. Data staat op het spel — maak een backup en controleer de schijf."
+      # ── Host / exporter down ────────────────────────────────────────────────
+      - alert: HostDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Host {{ $labels.instance }} ({{ $labels.job }}) is down"
+          description: "{{ $labels.job }} op {{ $labels.instance }} reageert niet meer"

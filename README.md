@@ -76,6 +76,8 @@ Every service gets its own `.home` domain. Pi-hole resolves it to the reverse pr
 | [`infrastructure/`](infrastructure/) | [Proxmox host](infrastructure/proxmox-host.md), [network](infrastructure/network.md) and [security](infrastructure/security.md) |
 | [`services/`](services/) | One page per VM or container: what runs there, how it's set up, and what I learned |
 
+Config files (`docker-compose.yml`, Prometheus rules, firewall scripts) are the real ones from the servers, with secrets replaced by `${VARIABLES}` (see each `.env.example`) and internal addresses replaced by placeholders such as `<lan-ip>` and `example.home`.
+
 ## Roadmap
 
 - Offsite backups for the Digital Vault data

@@ -1,0 +1,51 @@
+name: ai-agents
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - /opt/ollama:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  syncthing:
+    image: syncthing/syncthing:latest
+    container_name: syncthing
+    restart: unless-stopped
+    hostname: ai-agents-syncthing
+    environment:
+      - PUID=1000
+      - PGID=1000
+    ports:
+      - "8384:8384"       # Web GUI
+      - "22000:22000/tcp" # Sync
+      - "22000:22000/udp" # Sync (QUIC)
+      - "21027:21027/udp" # Local discovery
+    volumes:
+      - /home/<user>/obsidian-vault:/var/syncthing/vault
+      - /home/<user>/docker/syncthing-config:/var/syncthing/config
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - GENERIC_TIMEZONE=Europe/Amsterdam
+      - TZ=Europe/Amsterdam
+      # Served through the Nginx reverse proxy (LXC104)
+      - N8N_HOST=example.home
+      - N8N_PORT=5678
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - N8N_PROTOCOL=https
+    volumes:
+      - /home/<user>/docker/n8n-data:/home/node/.n8n

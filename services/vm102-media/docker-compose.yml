@@ -1,0 +1,161 @@
+version: "3.8"
+
+networks:
+ torrent_net:
+    driver: bridge
+
+services:
+  gluetun:
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - VPN_TYPE=wireguard
+      - SERVER_COUNTRIES=Netherlands
+      - VPN_PORT_FORWARDING=on
+      - VPN_PORT_FORWARDING_PROVIDER=protonvpn
+      - FIREWALL_OUTBOUND_SUBNETS=<lan-ip>/24
+      - HTTPPROXY=on
+      - HTTP_CONTROL_SERVER_ADDRESS=:8000
+    ports:
+      - "8000:8000"
+      - "8080:8080"
+    volumes:
+      - ./gluetun/auth:/gluetun/auth:ro
+    secrets:
+      - wireguard_private_key
+    networks:
+      - torrent_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "[ -s /tmp/gluetun/forwarded_port ] || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    network_mode: "service:gluetun"
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Europe/Amsterdam
+      - WEBUI_PORT=8080
+    volumes:
+      - ./qbittorrent:/config
+      - /mnt/4tb/movies:/data
+    restart: unless-stopped
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        restart: true
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Europe/Amsterdam
+    volumes:
+      - ./prowlarr:/config
+    ports:
+      - "9696:9696"
+    networks:
+      - torrent_net
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Europe/Amsterdam
+    volumes:
+      - ./radarr:/config
+      - /mnt/4tb/movies:/data
+    ports:
+      - "7878:7878"
+    networks:
+      - torrent_net
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Europe/Amsterdam
+    volumes:
+      - ./sonarr:/config
+      - /mnt/4tb/movies:/data
+    ports:
+      - "8989:8989"
+    networks:
+      - torrent_net
+    restart: unless-stopped
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Europe/Amsterdam
+    volumes:
+      - ./jellyfin:/config
+      - /mnt/4tb/movies/library:/data/movies
+      - /mnt/4tb/movies/series:/data/series
+    ports:
+      - "8096:8096"
+    networks:
+      - torrent_net
+    restart: unless-stopped
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Europe/Amsterdam
+    volumes:
+      - ./bazarr:/config
+      - /mnt/4tb/movies:/data
+    ports:
+      - "6767:6767"
+    networks:
+      - torrent_net
+    restart: unless-stopped
+
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    container_name: seerr
+    init: true
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=Europe/Amsterdam
+    ports:
+      - "5055:5055"
+    volumes:
+      - ./seerr:/app/config
+      - /mnt/4tb/movies:/media
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/settings/public || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
+    networks:
+      - torrent_net
+    restart: unless-stopped
+
+secrets:
+  wireguard_private_key:
+    file: ./gluetun/wg-private.key

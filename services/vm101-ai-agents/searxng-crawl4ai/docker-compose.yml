@@ -1,0 +1,69 @@
+# SearXNG + Crawl4AI MCP - Truly Self-Hosted Search & Scrape Stack
+
+services:
+  # SearXNG - Open source metasearch engine
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    ports:
+      - "8081:8080"
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8081/
+      - SEARXNG_SECRET=${SEARXNG_SECRET}
+    volumes:
+      - ./searxng-settings.yml:/etc/searxng/settings.yml:ro
+      - ./limiter.toml:/etc/searxng/limiter.toml:ro
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+    networks:
+      - search-net
+    restart: unless-stopped
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8080/ || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis for caching
+  redis:
+    image: redis:alpine
+    command: redis-server --save 30 1 --loglevel warning
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - search-net
+    restart: unless-stopped
+    healthcheck:
+      test: redis-cli ping
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Crawl4AI service for web scraping
+  crawl4ai:
+    image: unclecode/crawl4ai:latest
+    container_name: crawl4ai
+    ports:
+      - "11235:11235"
+    environment:
+      - CRAWL4AI_API_TOKEN=${CRAWL4AI_API_TOKEN}
+      - CRAWL4AI_LOG_LEVEL=INFO
+    networks:
+      - search-net
+    restart: unless-stopped
+    shm_size: 1g
+
+
+volumes:
+  redis_data:
+
+networks:
+  search-net:
+    driver: bridge
