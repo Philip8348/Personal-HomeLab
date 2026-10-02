@@ -29,7 +29,13 @@ My own private PKI, so every internal service runs on HTTPS without browser warn
 
 ## Renewal
 
-The server certificate is valid for about two years and is renewed by hand, with a reminder set ahead of the expiry date.
+The server certificate is valid for about two years (800 days, just under the 825-day limit Apple devices enforce for TLS certificates) and is renewed by hand, with a reminder set ahead of the expiry date.
+
+A renewal script with a monthly systemd timer exists on the proxy ([`cert-renew/`](../lxc104-reverse-proxy/cert-renew/)): it runs `step ca renew`, rebuilds the full chain (leaf + intermediate) and reloads Nginx. The timer is disabled for now, because a renewal has to stay within the provisioner's maximum certificate lifetime.
+
+## Config
+
+[`step-ca/ca.json`](step-ca/ca.json) is the CA configuration with the provisioner keys removed: a JWK provisioner with an extended maximum TLS lifetime, an ACME provisioner, and TLS 1.2–1.3 only.
 
 ## Lessons learned
 
