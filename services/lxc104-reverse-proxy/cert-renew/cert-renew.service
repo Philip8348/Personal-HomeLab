@@ -1,0 +1,6 @@
+[Unit]
+Description=Renew step-ca certificates
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/cert-renew.sh

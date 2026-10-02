@@ -1,0 +1,44 @@
+# Excerpt from /etc/pihole/pihole.toml (Pi-hole v6) — local DNS records, upstreams and DHCP
+# IP addresses replaced by <lan-ip>.
+
+[dns]
+  hosts = [
+    "<lan-ip> vaultwarden.example.home",
+    "<lan-ip> paperless.example.home",
+    "<lan-ip> immich.example.home",
+    "<lan-ip> immich-swipe.example.home",
+    "<lan-ip> nextcloud.example.home",
+    "<lan-ip> jellyfin.example.home",
+    "<lan-ip> radarr.example.home",
+    "<lan-ip> bazarr.example.home",
+    "<lan-ip> prowlarr.example.home",
+    "<lan-ip> qbittorrent.example.home",
+    "<lan-ip> jellyseerr.example.home",
+    "<lan-ip> ca.example.home",
+    "<lan-ip> pihole.example.home",
+    "<lan-ip> kuma.example.home",
+    "<lan-ip> wireguard.example.home",
+    "<lan-ip> homeassistant.example.home",
+    "<lan-ip> n8n.example.home",
+    "<lan-ip> grafana.example.home",
+    "<lan-ip> prometheus.example.home",
+    "<lan-ip> homarr.example.home",
+    "<lan-ip> pve.example.home",
+    "<lan-ip> gramps.example.home",
+    "<lan-ip> sonarr.example.home"
+  ]
+
+  # Allowed values are:
+  #     Array of IP addresses and/or hostnames, optionally with a port (#...)
+  upstreams = [
+    "8.8.8.8",
+    "8.8.4.4"
+  ]
+
+[dhcp]
+  # Is the embedded DHCP server enabled?
+  #
+  # Allowed values are:
+  #     true or false
+  active = false
+

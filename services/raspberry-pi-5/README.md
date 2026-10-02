@@ -33,6 +33,12 @@ The battery integration is deliberately read-only. An earlier Modbus integration
 
 Before this, a set of Python collectors wrote everything to InfluxDB and Grafana. Home Assistant's native integrations replaced all of that.
 
+## Pi-hole
+
+- Pi-hole v6. All local `.home` records live in `pihole.toml`; see [`pihole/pihole.toml.example`](pihole/pihole.toml.example) for the format (23 records, addresses replaced).
+- Upstream DNS is Google (8.8.8.8 / 8.8.4.4).
+- Pi-hole only does DNS. DHCP stays on the router.
+
 ## WireGuard
 
 - wg-easy v15, on nftables (the iptables-legacy variant crashed on the current kernel).
