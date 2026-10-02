@@ -38,7 +38,7 @@ Things I ran into along the way:
 - **Don't snapshot the nat table.** The first version restored a full iptables snapshot at boot. After a power cut the containers came back with new IP addresses, and the restored NAT rules pointed at containers that no longer existed. Now a small script fills only `DOCKER-USER`, and Docker manages NAT itself.
 - **Re-apply when Docker restarts.** The restore runs as a systemd unit with `PartOf=docker.service` and `Restart=on-failure`, so a Docker restart reapplies the rules automatically.
 
-The actual script and unit: [`firewall/restore-docker-user.sh`](firewall/restore-docker-user.sh) and [`firewall/docker-ufw-restore.service`](firewall/docker-ufw-restore.service).
+The actual script: [`firewall/restore-docker-user.sh`](firewall/restore-docker-user.sh).
 
 ## VPN
 
